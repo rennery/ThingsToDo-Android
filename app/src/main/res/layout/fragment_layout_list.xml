@@ -1,0 +1,23 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/fragment_container"
+    android:background="@drawable/bbbb"
+    android:gravity="top"
+
+
+    >
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/li_list"
+        android:divider="@drawable/list_view_color"
+        android:dividerHeight="1dip"
+        android:background="@drawable/bit_back"
+        ></ListView>
+
+
+
+
+</LinearLayout>
