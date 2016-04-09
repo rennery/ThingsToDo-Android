@@ -12,6 +12,8 @@ public class Thing_data {
     private double latitude;
     private double longtitude;
     private long thingdate;
+    private String mess;
+    private long thingtime;
 
     public long getThingtime() {
         return thingtime;
@@ -21,7 +23,7 @@ public class Thing_data {
         this.thingtime = thingtime;
     }
 
-    private long thingtime;
+
 
     public String getMess() {
         return mess;
@@ -31,7 +33,7 @@ public class Thing_data {
         this.mess = mess;
     }
 
-    private String mess;
+
 
     public int getId() {
         return id;

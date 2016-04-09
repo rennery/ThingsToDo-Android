@@ -18,6 +18,8 @@
         android:id="@+id/allthings"
         android:textColor="#000000"
         android:gravity="center"
+        android:singleLine="true"
+        android:ellipsize="end"
         android:layout_weight="10"
 
         android:textSize="23dp"/>

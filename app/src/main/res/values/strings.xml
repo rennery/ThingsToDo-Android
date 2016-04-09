@@ -6,7 +6,9 @@
     <string name="hint_title">Please input notification name</string>
     <string name="title_activity_main_page">MainPage</string>
     <string name="allthings">You have</string>
-
-<!-- TODO: Remove or change this placeholder text -->
+    <string name="title">title</string>
+    <string name="address">add.</string>
+    <string name="method">method</string>
+    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

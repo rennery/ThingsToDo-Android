@@ -19,7 +19,7 @@ public class FileIssue extends SQLiteOpenHelper{
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("create table IF NOT EXISTS things(id integer primary key, location varchar, latitude real, longtitude real, thingdate integer, ,thingtime integer, messageadte varchar)");
+        db.execSQL("create table IF NOT EXISTS things(id integer primary key, title varchar, location varchar, latitude real, longtitude real, thingdate integer, ,thingtime integer, messageadte varchar)");
         Log.i("Database", "onCreate");
     }
 

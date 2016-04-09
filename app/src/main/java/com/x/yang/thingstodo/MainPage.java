@@ -72,7 +72,7 @@ public class MainPage extends FragmentActivity {
         ls.getLooper();
         LocationManager locationManager=(LocationManager)MainPage.this.getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        criteria.setAccuracy(Criteria.ACCURACY_MEDIUM);
         criteria.setAltitudeRequired(false);
         criteria.setBearingRequired(false);
         criteria.setCostAllowed(true);

@@ -76,6 +76,9 @@ public class Alldata {
         }
 
     }
+    public void setDate(String location, String mess){
+
+    }
 
     public int getNumAll(){
         int opt = 0;
