@@ -1,11 +1,14 @@
 package com.x.yang.thingstodo;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +19,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -28,8 +32,10 @@ public class fregrement_list extends android.support.v4.app.Fragment {
 
 
     private ListView lv;
+    SimpleAdapter sa;
     List<Map<String, Object>> listems;
     Alldata ad;
+    NewReceiver receiver;
 
     public fregrement_list() {
         // Required empty public constructor
@@ -48,16 +54,60 @@ public class fregrement_list extends android.support.v4.app.Fragment {
             Map<String, Object> listem2 = new HashMap<String, Object>();
             listem2.put("head", "click to add new event");
             listem2.put("name", R.drawable.add);
+            listem2.put("id","addnew");
+            listem2.put("date","");
             listems.add(listem2);
-            SimpleAdapter sa = new SimpleAdapter(this.getActivity(),listems,R.layout.add_new_list,new String[] { "head", "name"},
-                    new int[] {R.id.allthings,R.id.thingimage});
+            sa = new SimpleAdapter(this.getActivity(),listems,R.layout.add_new_list,new String[] { "head", "name","id","date"},
+                    new int[] {R.id.allthings,R.id.thingimage,R.id.evet_id,R.id.thingdate});
             lv.setAdapter(sa);
             lv.setOnItemClickListener(new listclick());
         }else{
-            while(ad.list.iterator().hasNext()){
+            Map<String, Object> listem = new HashMap<String, Object>();
+            listem.put("head", "click to add new event");
+            listem.put("name", R.drawable.add);
+            listem.put("id","addnew");
+            listem.put("date","");
+            listems.add(listem);
+            Iterator<Thing_data> lt = ad.list.iterator();
+            while(lt.hasNext()){
+                Log.i("readlist","reading");
+                Thing_data td = lt.next();
+                Map<String, Object> listem2 = new HashMap<String, Object>();
+                listem2.put("head",td.getTitle());
+                if(td.getFre().equalsIgnoreCase("weekly")){
+                    Log.i("fre","here");
+                    listem2.put("name", R.drawable.week);
+                }else if(td.getFre().equalsIgnoreCase("daily")){
+                    listem2.put("name", R.drawable.dayly);
+                }else if(td.getFre().equalsIgnoreCase("monthly")){
+                    listem2.put("name", R.drawable.month);
+                }else {
+                    listem2.put("name", R.drawable.once);
+                }
 
+                listem2.put("id",td.getId());
+                if((td.getMonth()+1) < 10 && td.getDay()<10){
+                    listem2.put("date","0"+(td.getMonth()+1)+"-0"+td.getDay()+" "+td.getHour()+" : "+td.getMin());
+                }
+                else if((td.getMonth()+1) < 10){
+                    listem2.put("date","0"+(td.getMonth()+1)+"-"+td.getDay()+" "+td.getHour()+" : "+td.getMin());
+                }else if(td.getDay()<10){
+                    listem2.put("date",(td.getMonth()+1)+"-0"+td.getDay()+" "+td.getHour()+" : "+td.getMin());
+                }else{
+                    listem2.put("date",(td.getMonth()+1)+"-"+td.getDay()+" "+td.getHour()+" : "+td.getMin());
+                }
+
+                listems.add(listem2);
             }
+            sa = new SimpleAdapter(this.getActivity(),listems,R.layout.add_new_list,new String[] { "head", "name","id","date"},
+                    new int[] {R.id.allthings,R.id.thingimage,R.id.evet_id,R.id.thingdate});
+            lv.setAdapter(sa);
+            lv.setOnItemClickListener(new listclick());
         }
+        receiver=new NewReceiver();
+        IntentFilter filter=new IntentFilter();
+        filter.addAction("com.x.yang.thingstodo.NEWEVENT");
+        this.getActivity().registerReceiver(receiver, filter);
 
 
         // Inflate the layout for this fragment
@@ -104,12 +154,47 @@ public class fregrement_list extends android.support.v4.app.Fragment {
 
                 Intent i =new Intent(getActivity(),Adding.class);
                 startActivity(i);
+            }else{
+
             }
 
         }
     }
+    public class NewReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Bundle bundle=intent.getExtras();
+            String v;
+
+            Map<String, Object> listem2 = new HashMap<String, Object>();
+            listem2.put("head", bundle.getString("tit"));
+            Log.i("fre",bundle.getString("fre"));
+            if(bundle.getString("fre").equalsIgnoreCase("weekly")){
+                Log.i("fre","here");
+                listem2.put("name", R.drawable.week);
+            }else if(bundle.getString("fre").equalsIgnoreCase("daily")){
+                listem2.put("name", R.drawable.dayly);
+            }else if(bundle.getString("fre").equalsIgnoreCase("monthly")){
+                listem2.put("name", R.drawable.month);
+            }else {
+                listem2.put("name", R.drawable.once);
+            }
+            listem2.put("id",bundle.getString("id"));
+            listem2.put("date",bundle.getString("date"));
+            listems.add(listem2);
+            sa.notifyDataSetChanged();
 
 
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        this.getActivity().unregisterReceiver(receiver);
+        super.onDestroy();
+    }
 }
 
 

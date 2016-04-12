@@ -24,6 +24,23 @@
         android:layout_weight="10"
 
         android:textSize="23dp"/>
+    <TextView
+        android:paddingLeft="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/thingdate"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:textColor="#000000"
+        android:gravity="center"
+        android:layout_weight="10"
+
+        android:textSize="23dp"/>
+    <TextView
+        android:layout_width="0px"
+        android:layout_height="0px"
+        android:id="@+id/evet_id"
+        android:visibility="invisible"/>
 
 
 </LinearLayout>

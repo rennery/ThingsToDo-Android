@@ -20,7 +20,7 @@ import java.util.Date;
 
 public class DataPickerFragment extends DialogFragment {
     private String intent;
-    private int d,y,m;
+    private int d,y,m,dw;
 
     @NonNull
     @Override
@@ -55,9 +55,11 @@ public class DataPickerFragment extends DialogFragment {
     private class dateChange implements DatePicker.OnDateChangedListener {
         @Override
         public void onDateChanged(DatePicker arg0, int year, int month, int day) {
+
             y = year;
             m = month;
             d = day;
+
         }
     }
 }

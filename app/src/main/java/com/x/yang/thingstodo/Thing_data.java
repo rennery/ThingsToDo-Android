@@ -7,48 +7,45 @@ import java.util.Date;
  */
 public class Thing_data {
 
-    private int id;
+    private String id;
     private String loc;
+    String title;
     private double latitude;
     private double longtitude;
-    private long thingdate;
+    private String fre;
     private String mess;
-    private long thingtime;
+    private int year,month,day,hour,min;
 
-    public long getThingtime() {
-        return thingtime;
+    public int getDay() {
+        return day;
     }
 
-    public void setThingtime(long thingtime) {
-        this.thingtime = thingtime;
+    public void setDay(int day) {
+        this.day = day;
     }
 
-
-
-    public String getMess() {
-        return mess;
+    public String getFre() {
+        return fre;
     }
 
-    public void setMess(String mess) {
-        this.mess = mess;
+    public void setFre(String fre) {
+        this.fre = fre;
     }
 
+    public int getHour() {
+        return hour;
+    }
 
+    public void setHour(int hour) {
+        this.hour = hour;
+    }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
-    }
-
-    public String getLoc() {
-        return loc;
-    }
-
-    public void setLoc(String loc) {
-        this.loc = loc;
     }
 
     public double getLatitude() {
@@ -59,6 +56,14 @@ public class Thing_data {
         this.latitude = latitude;
     }
 
+    public String getLoc() {
+        return loc;
+    }
+
+    public void setLoc(String loc) {
+        this.loc = loc;
+    }
+
     public double getLongtitude() {
         return longtitude;
     }
@@ -67,13 +72,43 @@ public class Thing_data {
         this.longtitude = longtitude;
     }
 
-    public long getThingdate() {
-        return thingdate;
+    public String getMess() {
+        return mess;
     }
 
-    public void setThingdate(long thingdate) {
-        this.thingdate = thingdate;
+    public void setMess(String mess) {
+        this.mess = mess;
     }
 
+    public int getMin() {
+        return min;
+    }
 
+    public void setMin(int min) {
+        this.min = min;
+    }
+
+    public int getMonth() {
+        return month;
+    }
+
+    public void setMonth(int month) {
+        this.month = month;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public int getYear() {
+        return year;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
+    }
 }

@@ -44,7 +44,7 @@
                     android:layout_height="wrap_content"
                     android:hint="input title of event"
                     android:singleLine="true"
-
+                    android:id ="@+id/title_in"
                     android:background="#50ffffff"
                     android:layout_weight="1"
                     android:textSize="18sp"/>
@@ -78,6 +78,7 @@
                     android:layout_height="wrap_content"
                     android:hint="input address of event"
                     android:singleLine="true"
+                    android:id="@+id/add_in"
                     android:layout_weight="1"
                     android:background="#50ffffff"
                     android:textSize="18sp"/>
@@ -106,12 +107,14 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:layout_weight="1"
+                    android:id="@+id/radio_add"
                     android:gravity="center"
                     >
                     <RadioButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="once"
+                        android:id="@+id/once"
                         android:textColor="#000000"
 
                         />
@@ -119,16 +122,19 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="#000000"
+                        android:id="@+id/weekly"
                         android:text="weekly"/>
                     <RadioButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="#000000"
-                        android:text="dayly"/>
+                        android:id="@+id/daily"
+                        android:text="daily"/>
                     <RadioButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="#000000"
+                        android:id="@+id/monthly"
                         android:text="monthly"/>
 
                 </RadioGroup>
@@ -163,6 +169,7 @@
                     android:minLines="4"
                     android:gravity="top"
                     android:layout_weight="1"
+                    android:id="@+id/mess_in"
                     android:background="#50ffffff"
                     android:scrollbars="vertical"
                     android:singleLine="false"
@@ -191,12 +198,7 @@
             android:background="@drawable/select_cilcked"
             android:paddingBottom="22sp"
             android:id="@+id/pick"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="event date"
-                android:textColor="#000000"
-                android:textSize="22dp"/>
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -204,19 +206,7 @@
                 android:textColor="#000000"
                 android:id="@+id/dateofevent"
                 android:textSize="22dp"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="event time"
-                android:textColor="#000000"
-                android:textSize="22dp"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="click the to select event date"
-                android:textColor="#000000"
-                android:id="@+id/timeofevent"
-                android:textSize="22dp"/>
+
         </LinearLayout>
 
     </FrameLayout>

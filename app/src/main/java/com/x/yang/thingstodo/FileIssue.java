@@ -11,7 +11,7 @@ import android.util.Log;
 public class FileIssue extends SQLiteOpenHelper{
 
     private static final String DB_name = "Things_XYang";
-    private static final int VERSION = 1;
+    private static final int VERSION = 2;
     public FileIssue(Context context) {
         super(context, DB_name, null, VERSION);
     }
@@ -19,7 +19,7 @@ public class FileIssue extends SQLiteOpenHelper{
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("create table IF NOT EXISTS things(id integer primary key, title varchar, location varchar, latitude real, longtitude real, thingdate integer, ,thingtime integer, messageadte varchar)");
+        db.execSQL("create table IF NOT EXISTS things(id varcgar primary key, title varchar, location varchar, latitude real, longtitude real, year integer ,month integer, day integer, hour integer, min integer, repeat varchar, messageadte varchar)");
         Log.i("Database", "onCreate");
     }
 

@@ -1,7 +1,9 @@
 package com.x.yang.thingstodo;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -39,7 +41,6 @@ public class MainPage extends FragmentActivity {
     public static String city="locating...";
     public static String state="";
     final int LEFT = 1;
-    private times count_down;
     private TimerTasks tt;
     private LocateSpot ls;
 
@@ -48,11 +49,12 @@ public class MainPage extends FragmentActivity {
     private Class fragmentsArray[] ={
             MainPageFragment.class,fregrement_list.class, fragment_message.class,frgrement_settings.class
     };
-    private String tabString[] ={"main","list","message","settings"};
+    private String tabString[] ={"main","list","detail","settings"};
 
     private int icons[]={R.drawable.main_icon,R.drawable.list_icon,R.drawable.message_icon,R.drawable.setting_icon};
     private GestureDetector gestureDetector;
     private FrameLayout fl;
+    changeReceiver receiver;
 
     Fragment f_main;
     @Override
@@ -61,11 +63,16 @@ public class MainPage extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_page);
         initView();
+        receiver=new changeReceiver();
+        IntentFilter filter=new IntentFilter();
+        filter.addAction("com.x.yang.thingstodo.CHANGE");
+        this.registerReceiver(receiver, filter);
 
         TabHost.setCurrentTab(0);
         Log.i("currenttab", TabHost.getCurrentTabTag());
+        Intent inte=new Intent(this,backService.class);
+        startService(inte);
         tt=new TimerTasks();
-        count_down=new times();
         tt.execute();
         ls = new LocateSpot("GPS");
         ls.start();
@@ -87,11 +94,13 @@ public class MainPage extends FragmentActivity {
 
 
 
+
     }
     private final LocationListener locationListener = new LocationListener()
     {
         public void onLocationChanged(Location location) {
             times.setL(location);
+            updateLoc();
             Intent intnet = new Intent("com.x.yang.thingstodo.GPSREADY");
             Log.i("GPS","update new location");
             sendBroadcast(intnet);
@@ -137,6 +146,54 @@ public class MainPage extends FragmentActivity {
 
         return v;
     }
+    private class changeReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle b = intent.getExtras();
+            if(b.getInt("tab") ==0){
+                TabHost.setCurrentTab(0);
+            }else if (b.getInt("tab") ==1){
+                TabHost.setCurrentTab(1);
+            }else if (b.getInt("tab") ==2){
+                TabHost.setCurrentTab(2);
+            }else if (b.getInt("tab") ==3){
+                TabHost.setCurrentTab(3);
+            }
+            Intent in = new Intent("com.x.yang.thingstodo.ACTION");
+            in.putExtra("act",b.getString("action"));
+            sendBroadcast(in);
+        }
+    }
+    private void updateLoc(){
+        Location location = times.getloc();
+        try{
+
+
+            Geocoder geo = new Geocoder(MainPage.this, Locale.getDefault());
+
+            Log.i("currenttab", Double.toString(location.getAltitude()));
+            List<Address> addresses = geo.getFromLocation(location.getLatitude(),location.getLongitude(),1);
+            Log.i("currenttab", "22333");
+            if (addresses.isEmpty()) {
+                Toast.makeText(MainPage.this, "Can't locate your city,please chcek setting of GPS", Toast.LENGTH_LONG).show();
+                Log.i("error","GPS");
+            }
+            else {
+                if (addresses.size() > 0) {
+                    MainPage.city  =addresses.get(0).getLocality();
+                    MainPage.state  =addresses.get(0).getAdminArea();
+                    Intent intnet = new Intent("com.x.yang.thingstodo.GPSREADY");
+                    sendBroadcast(intnet);
+
+                    Log.i("location", addresses.get(0).getFeatureName() + ", " + addresses.get(0).getLocality() +", " + addresses.get(0).getAdminArea() + ", " + addresses.get(0).getCountryName());
+                }
+            }
+        }catch(Exception e){
+
+
+        }
+    }
 
 
 
@@ -145,6 +202,7 @@ public class MainPage extends FragmentActivity {
 
         @Override
         protected Object doInBackground(Object[] params) {
+            Log.i("cur", "12444333");
 
             LocationManager locationManager=(LocationManager)MainPage.this.getSystemService(Context.LOCATION_SERVICE);
             Criteria criteria = new Criteria();
@@ -155,41 +213,10 @@ public class MainPage extends FragmentActivity {
             criteria.setPowerRequirement(Criteria.POWER_LOW);
 
             String provider = locationManager.getBestProvider(criteria, true);
-            Location location=locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-
-            try{
-                Log.i("currenttab", "12333");
-
-                Geocoder geo = new Geocoder(MainPage.this, Locale.getDefault());
-
-                Log.i("currenttab", Double.toString(location.getAltitude()));
-                List<Address> addresses = geo.getFromLocation(location.getLatitude(),location.getLongitude(),1);
-                Log.i("currenttab", "22333");
-                if (addresses.isEmpty()) {
-                    Toast.makeText(MainPage.this, "Can't locate your city,please chcek setting of GPS", Toast.LENGTH_LONG).show();
-                    Log.i("error","GPS");
-                }
-                else {
-                    if (addresses.size() > 0) {
-                        MainPage.city  =addresses.get(0).getLocality();
-                        MainPage.state  =addresses.get(0).getAdminArea();
-                        Intent intnet = new Intent("com.x.yang.thingstodo.GPSREADY");
-                        sendBroadcast(intnet);
-                        times.setL(location);
-                        Log.i("location", addresses.get(0).getFeatureName() + ", " + addresses.get(0).getLocality() +", " + addresses.get(0).getAdminArea() + ", " + addresses.get(0).getCountryName());
-                    }
-                }
-            }catch(Exception e){
-
-
-            }
-
-
-
-
-
-
+            Location location=locationManager.getLastKnownLocation(provider);
+            Log.i("cur", "12333");
+            times.setL(location);
+            updateLoc();
             long k=3000L;
 
             return null;
@@ -199,6 +226,7 @@ public class MainPage extends FragmentActivity {
     @Override
     protected void onDestroy() {
         ls.quit();
+        this.unregisterReceiver(receiver);
         super.onDestroy();
     }
 }

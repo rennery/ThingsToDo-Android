@@ -24,8 +24,7 @@ public class MainActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        iv_welcome=(ImageView)findViewById(R.id.im_welcome);
-        iv_welcome.setImageResource(R.drawable.welcome1);
+
         Alldata.getInstance(this);
 
 

@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -40,6 +41,7 @@ public class MainPageFragment extends Fragment {
     private ListView lv;
     private TextView city1,state1,day;
     Thread mThread;
+    Alldata ad;
     BReceiver receiver;
     SimpleDateFormat formatter;
     Date curDate;
@@ -58,11 +60,12 @@ public class MainPageFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         View v =inflater.inflate(R.layout.fragment_main_page, container, false);
         List<Map<String, Object>> listems = new ArrayList<Map<String, Object>>();
         //Alldata ad = Alldata.getInstance(this.getActivity());
         city1 = (TextView)v.findViewById(R.id.city);
-
+        ad = Alldata.getInstance(this.getActivity());
         state1 = (TextView)v.findViewById(R.id.state);
         city1.setText(MainPage.city);
         state1.setText(MainPage.state);
@@ -73,13 +76,14 @@ public class MainPageFragment extends Fragment {
         this.getActivity().registerReceiver(receiver, filter);
 
 
+
         day.setText(str);
 
 
         for (int i = 0; i < 4; i++) {
             if(i == 0){
             Map<String, Object> listem = new HashMap<String, Object>();
-            listem.put("head", "You've "+i+" need to do today");
+            listem.put("head", "You've "+ad.num_today+" need to do today");
             listem.put("name", R.drawable.check);
             listems.add(listem);
             }else if(i == 1){
@@ -106,6 +110,7 @@ public class MainPageFragment extends Fragment {
                 new int[] {R.id.allthings,R.id.thingimage});
         lv =(ListView)v.findViewById(R.id.li_main);
         lv.setAdapter(sa);
+        lv.setOnItemClickListener(new listclick_main());
         Log.i("currenttab", "I am here");
         return v;
     }
@@ -121,11 +126,46 @@ public class MainPageFragment extends Fragment {
         }
     }
 
+
     @Override
     public void onDestroy() {
         Log.i("kill","killed");
         this.getActivity().unregisterReceiver(receiver);
         super.onDestroy();
+    }
+    private class listclick_main implements AdapterView.OnItemClickListener {
+
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            ListView lv = (ListView)parent;
+            HashMap<String,Object> item = (HashMap<String,Object>)lv.getItemAtPosition(position);
+            String tv = item.get("head").toString();
+            if(tv == "Check all listed event"){
+
+                Intent i =new Intent("com.x.yang.thingstodo.CHANGE");
+                i.putExtra("tab",1);
+                MainPageFragment.this.getActivity().sendBroadcast(i);
+            }else if(tv.contains("You've ")){
+                Intent i =new Intent("com.x.yang.thingstodo.CHANGE");
+                i.putExtra("tab",2);
+                i.putExtra("action","today event");
+                MainPageFragment.this.getActivity().sendBroadcast(i);
+            }else if(tv == "Check the nearest event"){
+
+                Intent i =new Intent("com.x.yang.thingstodo.CHANGE");
+                i.putExtra("tab",2);
+                i.putExtra("action","nearest");
+                MainPageFragment.this.getActivity().sendBroadcast(i);
+            }else if(tv == "The next moment event"){
+
+                Intent i =new Intent("com.x.yang.thingstodo.CHANGE");
+                i.putExtra("tab",2);
+                i.putExtra("action","next");
+                MainPageFragment.this.getActivity().sendBroadcast(i);
+            }
+
+        }
     }
 
 
