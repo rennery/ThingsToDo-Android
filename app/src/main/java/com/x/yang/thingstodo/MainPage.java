@@ -1,5 +1,7 @@
 package com.x.yang.thingstodo;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -77,6 +79,15 @@ public class MainPage extends FragmentActivity {
         ls = new LocateSpot("GPS");
         ls.start();
         ls.getLooper();
+        Bundle bundle = getIntent().getExtras();
+        if(bundle !=null){
+            if(bundle.getString("action") == "timeup"){
+                TabHost.setCurrentTab(2);
+                Intent intent = new Intent("com.x.yang.DETAIL.SINGLE");
+                intent.putExtra("id",bundle.getString("id"));
+                sendBroadcast(intent);
+            }
+        }
         LocationManager locationManager=(LocationManager)MainPage.this.getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_MEDIUM);
@@ -88,10 +99,6 @@ public class MainPage extends FragmentActivity {
         String provider = locationManager.getBestProvider(criteria, true);
         Location location=locationManager.getLastKnownLocation(provider);
         locationManager.requestLocationUpdates(provider, 1000*60, 100, locationListener);
-
-
-
-
 
 
 

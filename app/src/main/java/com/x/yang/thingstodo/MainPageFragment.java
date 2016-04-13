@@ -43,6 +43,8 @@ public class MainPageFragment extends Fragment {
     Thread mThread;
     Alldata ad;
     BReceiver receiver;
+    next_nearReceiver receiver2;
+    private String id_near,id_next;
     SimpleDateFormat formatter;
     Date curDate;
     String str;
@@ -74,6 +76,10 @@ public class MainPageFragment extends Fragment {
         IntentFilter filter=new IntentFilter();
         filter.addAction("com.x.yang.thingstodo.GPSREADY");
         this.getActivity().registerReceiver(receiver, filter);
+        receiver2=new next_nearReceiver();
+        IntentFilter filter2=new IntentFilter();
+        filter2.addAction("com.x.yang.thingstodo.NEXTNEARCHANGE");
+        this.getActivity().registerReceiver(receiver2, filter2);
 
 
 
@@ -125,12 +131,24 @@ public class MainPageFragment extends Fragment {
 
         }
     }
+    public class next_nearReceiver extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Bundle bundle=intent.getExtras();
+            id_near = bundle.getString("idnear");
+            id_next = bundle.getString("idnext");
+
+        }
+    }
 
 
     @Override
     public void onDestroy() {
         Log.i("kill","killed");
         this.getActivity().unregisterReceiver(receiver);
+        this.getActivity().unregisterReceiver(receiver2);
         super.onDestroy();
     }
     private class listclick_main implements AdapterView.OnItemClickListener {
@@ -153,15 +171,19 @@ public class MainPageFragment extends Fragment {
                 MainPageFragment.this.getActivity().sendBroadcast(i);
             }else if(tv == "Check the nearest event"){
 
-                Intent i =new Intent("com.x.yang.thingstodo.CHANGE");
+                Intent i = new Intent("com.x.yang.DETAIL.SINGLE");
                 i.putExtra("tab",2);
                 i.putExtra("action","nearest");
+                i.putExtra("id",id_near);
+                MainPageFragment.this.getActivity().sendBroadcast(i);
+
                 MainPageFragment.this.getActivity().sendBroadcast(i);
             }else if(tv == "The next moment event"){
 
-                Intent i =new Intent("com.x.yang.thingstodo.CHANGE");
+                Intent i =new Intent("com.x.yang.DETAIL.SINGLE");
                 i.putExtra("tab",2);
                 i.putExtra("action","next");
+                i.putExtra("id",id_next);
                 MainPageFragment.this.getActivity().sendBroadcast(i);
             }
 

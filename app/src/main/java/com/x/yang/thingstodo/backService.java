@@ -1,6 +1,8 @@
 package com.x.yang.thingstodo;
 
 import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -71,7 +73,7 @@ public class backService extends Service {
 
         String provider = locationManager.getBestProvider(criteria, true);
         location1=locationManager.getLastKnownLocation(provider);
-        locationManager.requestLocationUpdates(provider, 1000*60, 100, locationListener);
+        locationManager.requestLocationUpdates(provider, 1000*180, 1000, locationListener);
         new readingData().execute();
         receiver=new NewDReceiver();
         IntentFilter filter=new IntentFilter();
@@ -86,6 +88,7 @@ public class backService extends Service {
 
             Bundle bundle=intent.getExtras();
             String v;
+            Log.i("service","receivedboardcast");
             new readingData().execute();
         }
     }
@@ -143,11 +146,12 @@ public class backService extends Service {
         @Override
         protected Object doInBackground(Object[] params) {
             Log.i("service","compareThread");
+            AlarmManager alarmManager=(AlarmManager)backService.this.getSystemService(Context.ALARM_SERVICE);
             Iterator <Thing_data>it = list_today.iterator();
             Iterator <Thing_data>it2 = list.iterator();
             while(it.hasNext()){
                 Thing_data td =it.next();
-                AlarmManager alarmManager=null;
+
                 int hour,min,i;
                 hour = td.getHour();
                 min =td.getMin();
@@ -155,41 +159,79 @@ public class backService extends Service {
                     id_o_n = td.getId();
                 }
                 Calendar c=Calendar.getInstance();
+                Calendar c2=Calendar.getInstance();
                 i = c.get(Calendar.SECOND)+c.get(Calendar.MINUTE);
-                c.setTimeInMillis(System.currentTimeMillis());
-                c.set(Calendar.HOUR, hour);
-                c.set(Calendar.MINUTE, min);
-                c.set(Calendar.SECOND, 0);
-                c.set(Calendar.MILLISECOND, 0);
-                Log.i("today evet","added one");
-                Intent intent = new Intent(backService.this, MainPage.class);
-                intent.setAction(it.next().getId());
-                intent.putExtra("id",it.next().getId());
-                PendingIntent pi = PendingIntent.getBroadcast(backService.this, 0, intent, 0);    //创建PendingIntent
-                //alarmManager.set(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pi);        //设置闹钟
-                alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), pi);
-            }
-            list_near.clear();
-            while(it2.hasNext()){
-                float[] results;
-                results = new float[1];
-                Location.distanceBetween(location1.getLatitude(), location1.getLongitude(), it2.next().getLatitude(), it2.next().getLongtitude(), results);
 
-                if(results[0] <1000){
-                    list_near.add(it2.next().getId());
-                    if(results[0] < mindis){
-                        id_o_near = it2.next().getId();
+
+
+
+                int t =c.get(Calendar.HOUR_OF_DAY)*60*60*1000+c.get(Calendar.MINUTE)*60*1000;
+                int s=(min)*60*1000+hour*60*60*1000;
+                if(s-t>0){
+                    c2.set(Calendar.HOUR_OF_DAY,hour);
+                    c2.set(Calendar.MINUTE,min);
+
+                    if(s>0){
+                        Log.i("service","added one alarm");
+                        Log.i("service","s+t"+(s-t));
+                    Intent intent = new Intent(backService.this, MainPage.class);
+
+                    intent.putExtra("id",td.getId());
+                    intent.putExtra("action","timeup");
+                    PendingIntent pi = PendingIntent.getActivity(backService.this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+                    //alarmManager.set(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pi);
+
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, c2.getTimeInMillis(), pi);
                     }
                 }
             }
+            list_near.clear();
+            while(it2.hasNext()){
+                Thing_data td = it2.next();
+                float[] results;
+                results = new float[1];
+                Location.distanceBetween(location1.getLatitude(), location1.getLongitude(), td.getLatitude(), td.getLongtitude(), results);
+
+                if(results[0] <1000){
+                    list_near.add(td.getId());
+                    if(results[0] < mindis){
+                        id_o_near = td.getId();
+                    }
+                }
+            }
+
             return null;
         }
 
         @Override
         protected void onPostExecute(Object o) {
             super.onPostExecute(o);
+            if(list_near.size()>0){
+                NotificationManager manger = (NotificationManager) backService.this.getSystemService(Context.NOTIFICATION_SERVICE);
+
+
+                Notification notification = new Notification();
+                //notification.icon = R.drawable.notice;
+                Intent intent = new Intent(backService.this, MainPage.class);
+
+
+                intent.putExtra("action","nearevent");
+                intent.putStringArrayListExtra("list_near",list_near);
+                PendingIntent pi = PendingIntent.getActivity(backService.this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+
+                Notification notify2 = new Notification.Builder(backService.this)
+                        .setSmallIcon(R.drawable.notice)
+                        .setTicker("location update")
+                        .setContentTitle("Event near you")
+                        .setContentText(list_near.size()+" events around you within 1 km")
+                        .setContentIntent(pi)
+                        .setNumber(1).setDefaults(Notification.DEFAULT_SOUND)
+                        .getNotification();
+                manger.notify(0, notify2);
+            }
             idofnext = id_o_n;
             idofnearest = id_o_near;
+            Intent in =new Intent("com.x.yang.thingstodo.NEXTNEARCHANGE");
         }
     }
     class TimerTasks extends AsyncTask {
@@ -210,7 +252,7 @@ public class backService extends Service {
         public void onLocationChanged(Location location) {
             location1 = location;
             Intent intnet = new Intent("com.x.yang.thingstodo.GPSREADY");
-            Log.i("GPS","update new location");
+            Log.i("GPS_sev","update new location");
             sendBroadcast(intnet);
             new compareTask().execute();
 

@@ -86,11 +86,11 @@ public class fregrement_list extends android.support.v4.app.Fragment {
                 }
 
                 listem2.put("id",td.getId());
-                if((td.getMonth()+1) < 10 && td.getDay()<10){
-                    listem2.put("date","0"+(td.getMonth()+1)+"-0"+td.getDay()+" "+td.getHour()+" : "+td.getMin());
+                if((td.getMin()) < 10 && td.getDay()<10){
+                    listem2.put("date",(td.getMonth()+1)+"-0"+td.getDay()+" "+td.getHour()+" : 0"+td.getMin());
                 }
-                else if((td.getMonth()+1) < 10){
-                    listem2.put("date","0"+(td.getMonth()+1)+"-"+td.getDay()+" "+td.getHour()+" : "+td.getMin());
+                else if(td.getMin() < 10){
+                    listem2.put("date",(td.getMonth()+1)+"-"+td.getDay()+" "+td.getHour()+" : 0"+td.getMin());
                 }else if(td.getDay()<10){
                     listem2.put("date",(td.getMonth()+1)+"-0"+td.getDay()+" "+td.getHour()+" : "+td.getMin());
                 }else{

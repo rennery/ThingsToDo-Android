@@ -1,9 +1,249 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" tools:context="com.x.yang.thingstodo.fragment_message">
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:scrollbars="vertical"
+    android:background="@drawable/bbbb"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin">
+<LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    <ExpandableListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+    </ExpandableListView>
+</LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:id="@+id/whole"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/title"
+                    android:textColor="#000000"
+                    android:textSize="18sp"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="4"
+                android:orientation="vertical"
+                >
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="input title of event"
+                    android:singleLine="true"
+                    android:id ="@+id/title_in"
+                    android:background="#50ffffff"
+                    android:layout_weight="1"
+                    android:textSize="18sp"/>
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/address"
+                    android:textColor="#000000"
+                    android:layout_weight="1"
+                    android:textSize="18sp"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="4"
+                android:orientation="vertical">
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="input address of event"
+                    android:singleLine="true"
+                    android:id="@+id/add_in"
+                    android:layout_weight="1"
+                    android:background="#50ffffff"
+                    android:textSize="18sp"/>
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="frequent"
+                android:textColor="#000000"
+                android:layout_weight="1"
+                android:textSize="18sp"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:orientation="vertical">
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_weight="1"
+                android:id="@+id/radio_add"
+                android:gravity="center"
+                >
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="once"
+                    android:id="@+id/once"
+                    android:textColor="#000000"
+
+                    />
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#000000"
+                    android:id="@+id/weekly"
+                    android:text="weekly"/>
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#000000"
+                    android:id="@+id/daily"
+                    android:text="daily"/>
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#000000"
+                    android:id="@+id/monthly"
+                    android:text="monthly"/>
+
+            </RadioGroup>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:orientation="horizontal">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:id="@+id/pic"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:orientation="vertical">
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="take a picture or/and input message"
+                android:minLines="4"
+                android:gravity="top"
+                android:layout_weight="1"
+                android:id="@+id/mess_in"
+                android:background="#50ffffff"
+                android:scrollbars="vertical"
+                android:singleLine="false"
+                android:maxLines="4"
+                android:textSize="18sp"/>
+        </LinearLayout>
+    </LinearLayout>
 
 
-    <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-        android:text="you have no new message" />
 
-</FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="25dp"
+        android:paddingBottom="10dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center">
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="click the to select event date"
+                android:textColor="#000000"
+                android:id="@+id/dateofevent"
+                android:textSize="22dp"/>
+
+        </LinearLayout>
+
+    </FrameLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="bottom"
+        >
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#00000000">
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/back"
+                android:id="@+id/back"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#00000000"
+            android:gravity="left">
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/change"
+                android:paddingRight="10dp"
+                android:id="@+id/change"/>
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/delete"
+                android:id="@+id/delete"/>
+        </LinearLayout>
+
+
+    </LinearLayout>
+</LinearLayout>
+

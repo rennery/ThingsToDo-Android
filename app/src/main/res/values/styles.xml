@@ -3,6 +3,15 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
+        <item name="android:textColorPrimaryInverse">
+            @color/abc_background_cache_hint_selector_material_light
+        </item>
+    </style>
+
+    <style name="ffff" parent="Theme.AppCompat.Light.NoActionBar" >
+        <item name="android:textColorSecondaryInverse">
+            @color/abc_background_cache_hint_selector_material_light
+        </item>
     </style>
 
 </resources>

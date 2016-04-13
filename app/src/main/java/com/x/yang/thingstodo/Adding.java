@@ -52,7 +52,7 @@ public class Adding extends FragmentActivity implements DataPickerFragment.DateP
     String frequent,addr;
     Alldata ad;
     boolean ready =false;
-    double latitude, longtitude;
+    double latitude=0.0, longtitude=0.0;
     String id = "";
     GEOTasks tt;
 
@@ -167,7 +167,8 @@ public class Adding extends FragmentActivity implements DataPickerFragment.DateP
 
                 }else{
                     //ready = false;
-                    str ="warning: your address is not correct, please check it";
+                    str ="warning: your address may be not correct, please check it";
+                    ready = true;
                     //Toast.makeText(Adding.this,"your address is not correct, please check it",Toast.LENGTH_LONG).show();
                 }
             } catch (IOException e) {
@@ -226,8 +227,14 @@ public class Adding extends FragmentActivity implements DataPickerFragment.DateP
                     in.putExtra("tit",tit.getText().toString());
                     in.putExtra("fre",frequent);
                     in.putExtra("id",id);
-                    in.putExtra("date",(month+1)+"-"+day+" "+hour+" : "+min);
+                    if(min<10){
+                        in.putExtra("date",(month+1)+"-"+day+" "+hour+" : 0"+min);
+                    }else{
+                        in.putExtra("date",(month+1)+"-"+day+" "+hour+" : "+min);
+                    }
                     sendBroadcast(in);
+                    Intent in2 =new Intent("com.x.yang.thingstodo.NEWEVENT_S");
+                    sendBroadcast(in2);
                     Adding.this.finish();
                     }
                     break;
@@ -272,8 +279,7 @@ public class Adding extends FragmentActivity implements DataPickerFragment.DateP
         }
         }
         //save database............./
-        latitude = l.getLatitude();
-        longtitude = l.getLongitude();
+
         ad.setDate(title,message,id,addr,longtitude,latitude,year,month,day,hour,min,frequent);
 
 
