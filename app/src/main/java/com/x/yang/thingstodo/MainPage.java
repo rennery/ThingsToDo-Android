@@ -40,10 +40,12 @@ import java.util.TimerTask;
 public class MainPage extends FragmentActivity {
 
     final int RIGHT = 0;
+    private static boolean created = false;
     public static String city="locating...";
     public static String state="";
     final int LEFT = 1;
     private TimerTasks tt;
+    Alldata ad;
     private LocateSpot ls;
 
     private android.support.v4.app.FragmentManager fm;
@@ -57,48 +59,36 @@ public class MainPage extends FragmentActivity {
     private GestureDetector gestureDetector;
     private FrameLayout fl;
     changeReceiver receiver;
+    InnerReceiver ir;
+    TimerTask timertask= new TimerTask(){
+        public void run(){
+
+            Intent intent2 = new Intent("com.x.yang.thingstodo.CHANGE");
+            intent2.putExtra("tab",0);
+            MainPage.this.sendBroadcast(intent2);
+
+        }
+    };;
 
     Fragment f_main;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.i("main","created");
+        Alldata.getInstance(this);
         fm=getSupportFragmentManager();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_page);
-        initView();
+        created = true;
+        ir =new InnerReceiver();
+        IntentFilter filter2=new IntentFilter();
+        filter2.addAction("com.x.yang.DETAIL.SINGLE");
+        this.registerReceiver(ir, filter2);
         receiver=new changeReceiver();
         IntentFilter filter=new IntentFilter();
         filter.addAction("com.x.yang.thingstodo.CHANGE");
         this.registerReceiver(receiver, filter);
 
-        TabHost.setCurrentTab(0);
-        Log.i("currenttab", TabHost.getCurrentTabTag());
-        Intent inte=new Intent(this,backService.class);
-        startService(inte);
-        tt=new TimerTasks();
-        tt.execute();
-        ls = new LocateSpot("GPS");
-        ls.start();
-        ls.getLooper();
-        Bundle bundle = getIntent().getExtras();
-        if(bundle !=null){
-            if(bundle.getString("action") == "timeup"){
-                TabHost.setCurrentTab(2);
-                Intent intent = new Intent("com.x.yang.DETAIL.SINGLE");
-                intent.putExtra("id",bundle.getString("id"));
-                sendBroadcast(intent);
-            }
-        }
-        LocationManager locationManager=(LocationManager)MainPage.this.getSystemService(Context.LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_MEDIUM);
-        criteria.setAltitudeRequired(false);
-        criteria.setBearingRequired(false);
-        criteria.setCostAllowed(true);
-        criteria.setPowerRequirement(Criteria.POWER_LOW);
 
-        String provider = locationManager.getBestProvider(criteria, true);
-        Location location=locationManager.getLastKnownLocation(provider);
-        locationManager.requestLocationUpdates(provider, 1000*60, 100, locationListener);
 
 
 
@@ -167,9 +157,7 @@ public class MainPage extends FragmentActivity {
             }else if (b.getInt("tab") ==3){
                 TabHost.setCurrentTab(3);
             }
-            Intent in = new Intent("com.x.yang.thingstodo.ACTION");
-            in.putExtra("act",b.getString("action"));
-            sendBroadcast(in);
+
         }
     }
     private void updateLoc(){
@@ -234,6 +222,64 @@ public class MainPage extends FragmentActivity {
     protected void onDestroy() {
         ls.quit();
         this.unregisterReceiver(receiver);
+        this.unregisterReceiver(ir);
         super.onDestroy();
+    }
+    private class InnerReceiver extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            TabHost.setCurrentTab(2);
+
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        TabHost.getTabWidget().setEnabled(false);
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        initView();
+        Log.i("currenttab", TabHost.getCurrentTabTag());
+        Intent inte=new Intent(this,backService.class);
+        startService(inte);
+        tt=new TimerTasks();
+        tt.execute();
+        ls = new LocateSpot("GPS");
+        ls.start();
+        ls.getLooper();
+
+
+        LocationManager locationManager=(LocationManager)MainPage.this.getSystemService(Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_MEDIUM);
+        criteria.setAltitudeRequired(false);
+        criteria.setBearingRequired(false);
+        criteria.setCostAllowed(true);
+        criteria.setPowerRequirement(Criteria.POWER_LOW);
+
+        String provider = locationManager.getBestProvider(criteria, true);
+        Location location=locationManager.getLastKnownLocation(provider);
+        locationManager.requestLocationUpdates(provider, 1000*60, 1000, locationListener);
+        TabHost.setCurrentTab(2);
+
+        Timer timer = new Timer(true);
+        timer.schedule(timertask,10);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        TabHost.getTabWidget().setEnabled(true);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        this.finish();
+        super.onSaveInstanceState(outState);
     }
 }

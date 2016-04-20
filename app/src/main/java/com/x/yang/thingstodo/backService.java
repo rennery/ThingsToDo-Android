@@ -26,6 +26,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
+import java.util.Timer;
 import java.util.TimerTask;
 
 /**
@@ -38,6 +39,7 @@ public class backService extends Service {
     public ArrayList<String>list_near;
     private SQLiteDatabase db;
     private FileIssue fi;
+    Timer timer;
     NewDReceiver receiver;
     String idofnearest,idofnext;
     @Nullable
@@ -65,7 +67,7 @@ public class backService extends Service {
 
         LocationManager locationManager=(LocationManager)getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        criteria.setAccuracy(Criteria.ACCURACY_MEDIUM);
         criteria.setAltitudeRequired(false);
         criteria.setBearingRequired(false);
         criteria.setCostAllowed(true);
@@ -73,13 +75,21 @@ public class backService extends Service {
 
         String provider = locationManager.getBestProvider(criteria, true);
         location1=locationManager.getLastKnownLocation(provider);
-        locationManager.requestLocationUpdates(provider, 1000*180, 1000, locationListener);
+        locationManager.requestLocationUpdates(provider, 1000*180, 2000, locationListener);
         new readingData().execute();
         receiver=new NewDReceiver();
         IntentFilter filter=new IntentFilter();
         filter.addAction("com.x.yang.thingstodo.NEWEVENT_S");
         this.registerReceiver(receiver, filter);
+        timer = new Timer(true);
+        timer.schedule(new compTask(),3600000,3600000);
         return Service.START_STICKY;
+    }
+    private class compTask extends TimerTask{
+        @Override
+        public void run() {
+            new compareTask().execute();
+        }
     }
     public class NewDReceiver extends BroadcastReceiver {
 
@@ -137,28 +147,31 @@ public class backService extends Service {
         }
     }
     class compareTask extends AsyncTask{
-        int nexthour=24;
-        int nextmin=60;
+        int nexthour=25;
+        int nextmin=61;
         float mindis = 20000.0F;
-        String id_o_n = "no things to do today";
-        String id_o_near = "no things less than 2KM";
+        String id_o_n = "nu";
+        String id_o_near = "nu";
 
         @Override
         protected Object doInBackground(Object[] params) {
             Log.i("service","compareThread");
+            int has = 0;
             AlarmManager alarmManager=(AlarmManager)backService.this.getSystemService(Context.ALARM_SERVICE);
             Iterator <Thing_data>it = list_today.iterator();
             Iterator <Thing_data>it2 = list.iterator();
+            Calendar c = Calendar.getInstance();
             while(it.hasNext()){
                 Thing_data td =it.next();
 
                 int hour,min,i;
                 hour = td.getHour();
                 min =td.getMin();
-                if(hour < nexthour || (hour == nexthour && min < nextmin)){
+                if((c.get(Calendar.HOUR_OF_DAY)<hour && (c.get(Calendar.HOUR_OF_DAY)+1)<hour) || (c.get(Calendar.MINUTE)<min && c.get(Calendar.HOUR_OF_DAY)==hour)) {
                     id_o_n = td.getId();
+                    has++;
                 }
-                Calendar c=Calendar.getInstance();
+                /*
                 Calendar c2=Calendar.getInstance();
                 i = c.get(Calendar.SECOND)+c.get(Calendar.MINUTE);
 
@@ -181,9 +194,31 @@ public class backService extends Service {
                     PendingIntent pi = PendingIntent.getActivity(backService.this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
                     //alarmManager.set(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pi);
 
-                    alarmManager.set(AlarmManager.RTC_WAKEUP, c2.getTimeInMillis(), pi);
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, c2.getTimeInMillis(), pi);*/
                     }
-                }
+            if(has != 0){
+                NotificationManager manger = (NotificationManager) backService.this.getSystemService(Context.NOTIFICATION_SERVICE);
+
+
+                Notification notification = new Notification();
+                //notification.icon = R.drawable.notice;
+                Intent intent = new Intent(backService.this, MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                intent.putExtra("action","nearevent");
+                intent.putStringArrayListExtra("list_near",list_near);
+                PendingIntent pi = PendingIntent.getActivity(backService.this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+
+                Notification notify2 = new Notification.Builder(backService.this)
+                        .setSmallIcon(R.drawable.notice)
+                        .setTicker("next event")
+                        .setContentTitle("Event are coming")
+                        .setContentText(has+" events are coming within 3 hours")
+                        .setContentIntent(pi)
+                        .setNumber(1).setDefaults(Notification.DEFAULT_SOUND)
+                        .getNotification();
+                manger.notify(0, notify2);
+
+
             }
             list_near.clear();
             while(it2.hasNext()){
@@ -217,6 +252,7 @@ public class backService extends Service {
 
                 intent.putExtra("action","nearevent");
                 intent.putStringArrayListExtra("list_near",list_near);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 PendingIntent pi = PendingIntent.getActivity(backService.this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 
                 Notification notify2 = new Notification.Builder(backService.this)
@@ -232,6 +268,9 @@ public class backService extends Service {
             idofnext = id_o_n;
             idofnearest = id_o_near;
             Intent in =new Intent("com.x.yang.thingstodo.NEXTNEARCHANGE");
+            in.putExtra("idnear",id_o_near);
+            in.putExtra("idnext",id_o_n);
+            sendBroadcast(in);
         }
     }
     class TimerTasks extends AsyncTask {

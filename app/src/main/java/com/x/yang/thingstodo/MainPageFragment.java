@@ -43,8 +43,9 @@ public class MainPageFragment extends Fragment {
     Thread mThread;
     Alldata ad;
     BReceiver receiver;
+    public static int showlist = 1;
     next_nearReceiver receiver2;
-    private String id_near,id_next;
+    private String id_near="nu",id_next="nu";
     SimpleDateFormat formatter;
     Date curDate;
     String str;
@@ -163,28 +164,45 @@ public class MainPageFragment extends Fragment {
 
                 Intent i =new Intent("com.x.yang.thingstodo.CHANGE");
                 i.putExtra("tab",1);
+                showlist = 1;
                 MainPageFragment.this.getActivity().sendBroadcast(i);
             }else if(tv.contains("You've ")){
                 Intent i =new Intent("com.x.yang.thingstodo.CHANGE");
-                i.putExtra("tab",2);
-                i.putExtra("action","today event");
+                i.putExtra("tab",1);
+                showlist = 2;
                 MainPageFragment.this.getActivity().sendBroadcast(i);
             }else if(tv == "Check the nearest event"){
-
+                if(id_near.contains( "nu")){
+                    Toast.makeText(getActivity(),"No event around you within 2KM!",Toast.LENGTH_LONG).show();
+                }else{
                 Intent i = new Intent("com.x.yang.DETAIL.SINGLE");
+                    fragment_message.display = ad.getData(id_near);
                 i.putExtra("tab",2);
                 i.putExtra("action","nearest");
                 i.putExtra("id",id_near);
                 MainPageFragment.this.getActivity().sendBroadcast(i);
-
-                MainPageFragment.this.getActivity().sendBroadcast(i);
+                Intent it = new Intent("com.x.yang.thingstodo.DETAIL.SHOW");
+                it.putExtra("tab",2);
+                it.putExtra("action","nearest");
+                it.putExtra("id",id_near);
+                MainPageFragment.this.getActivity().sendBroadcast(it);
+                }
             }else if(tv == "The next moment event"){
-
-                Intent i =new Intent("com.x.yang.DETAIL.SINGLE");
-                i.putExtra("tab",2);
-                i.putExtra("action","next");
-                i.putExtra("id",id_next);
-                MainPageFragment.this.getActivity().sendBroadcast(i);
+                if(id_next.contains( "nu")){
+                    Toast.makeText(getActivity(),"Nothing to do today!",Toast.LENGTH_LONG).show();
+                }else{
+                    fragment_message.display = ad.getData(id_next);
+                    Intent i =new Intent("com.x.yang.DETAIL.SINGLE");
+                    i.putExtra("tab",2);
+                    i.putExtra("action","next");
+                    i.putExtra("id",id_next);
+                    MainPageFragment.this.getActivity().sendBroadcast(i);
+                    Intent it = new Intent("com.x.yang.thingstodo.DETAIL.SHOW");
+                    it.putExtra("tab",2);
+                    it.putExtra("action","next");
+                    it.putExtra("id",id_next);
+                    MainPageFragment.this.getActivity().sendBroadcast(it);
+                }
             }
 
         }

@@ -5,6 +5,7 @@ import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -28,6 +29,7 @@ import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -45,12 +47,13 @@ public class Adding extends FragmentActivity implements DataPickerFragment.DateP
     private ImageView pic;
     private Bitmap bitmap;
     private int day,month,year,hour,min;
-    private String date_s;
+    private String date_s,changedID;
     private EditText tit, add, mess;
     private TextView date_t;
     private RadioGroup rg;
     String frequent,addr;
     Alldata ad;
+    private boolean isChange = false;
     boolean ready =false;
     double latitude=0.0, longtitude=0.0;
     String id = "";
@@ -59,6 +62,7 @@ public class Adding extends FragmentActivity implements DataPickerFragment.DateP
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_adding);
         ib_cam = (ImageButton)findViewById(R.id.cam);
         rg =(RadioGroup)findViewById(R.id.radio_add);
@@ -85,7 +89,42 @@ public class Adding extends FragmentActivity implements DataPickerFragment.DateP
              frequent = rb.getText().toString();
               }
             });
+        Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
+        if(bundle != null){
+            isChange = true;
 
+            Thing_data temp = ad.getDatafromDB(bundle.getString("id"));
+
+            changedID = bundle.getString("id");
+            latitude =temp.getLatitude();
+            longtitude = temp.getLongtitude();
+            ready = true;
+            FileInputStream fis = null;
+            try {
+                fis = new FileInputStream(Environment.getExternalStorageDirectory()+ "/finger/"+changedID+".png");
+                bitmap  = BitmapFactory.decodeStream(fis);
+                pic.setImageBitmap(bitmap);
+            } catch (FileNotFoundException e) {
+                bitmap = null;
+            }
+            tit.setText(temp.getTitle());
+            add.setText(temp.getLoc());
+            mess.setText(temp.getMess());
+            year = temp.getYear();
+            month = temp.getMonth();
+            day = temp.getDay();
+            min = temp.getMin();
+            hour = temp.getHour();
+            date_t.setText(temp.getYear()+"-"+temp.getMonth()+"-"+temp.getDay()+" "+temp.getHour()+":"+temp.getMin());
+            if(temp.getFre().contains("once")){
+                rg.check(R.id.once);
+            }else if(temp.getFre().contains("daily" )|| temp.getFre().contains( "dayly")){
+                rg.check(R.id.daily);
+            }else{
+                rg.check(R.id.monthly);
+            }
+        }
     }
 
     @Override
@@ -132,10 +171,11 @@ public class Adding extends FragmentActivity implements DataPickerFragment.DateP
 
         @Override
         public void onFocusChange(View v, boolean hasFocus) {
-            Log.i("aaa","aaaa");
+
             String s;
             if(hasFocus == false){
-               addr = add.getText().toString();
+                Log.i("adding","forcechange");
+                addr = add.getText().toString();
                 ready = false;
                 tt=new GEOTasks();
                 tt.execute();
@@ -198,6 +238,9 @@ public class Adding extends FragmentActivity implements DataPickerFragment.DateP
             switch(v.getId()){
                 case R.id.back:
                     Log.i("keys", "back");
+                    if(changedID != null){
+                        setResult(RESULT_CANCELED);
+                    }
                     Adding.this.finish();
                     break;
                 case R.id.cam:
@@ -219,23 +262,35 @@ public class Adding extends FragmentActivity implements DataPickerFragment.DateP
                     if(frequent == null){
                         Toast.makeText(Adding.this,"you need to select the frequent of this event",Toast.LENGTH_SHORT).show();
                     } else if(!ready){
-                        Toast.makeText(Adding.this,"Please check your address or wait for locating....",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(Adding.this,"Location problem, System will relocate after a while",Toast.LENGTH_SHORT).show();
+                        ready = true;
                     } else{
-                    saveEvent();
-                    Intent in =new Intent("com.x.yang.thingstodo.NEWEVENT");
+                        ad.deleteData(changedID);
 
-                    in.putExtra("tit",tit.getText().toString());
-                    in.putExtra("fre",frequent);
-                    in.putExtra("id",id);
-                    if(min<10){
-                        in.putExtra("date",(month+1)+"-"+day+" "+hour+" : 0"+min);
-                    }else{
-                        in.putExtra("date",(month+1)+"-"+day+" "+hour+" : "+min);
-                    }
-                    sendBroadcast(in);
-                    Intent in2 =new Intent("com.x.yang.thingstodo.NEWEVENT_S");
-                    sendBroadcast(in2);
-                    Adding.this.finish();
+                        saveEvent();
+                        for(int i=0;i<4000;i++);
+                        Intent in =new Intent("com.x.yang.thingstodo.NEWEVENT");
+
+                        in.putExtra("tit",tit.getText().toString());
+                        in.putExtra("fre",frequent);
+                        in.putExtra("id",id);
+                        if(min<10){
+                            in.putExtra("date",(month+1)+"-"+day+" "+hour+" : 0"+min);
+                        }else{
+                            in.putExtra("date",(month+1)+"-"+day+" "+hour+" : "+min);
+                        }
+                        sendBroadcast(in);
+                        Intent in2 =new Intent("com.x.yang.thingstodo.NEWEVENT_S");
+                        sendBroadcast(in2);
+                        if(changedID != null){
+
+                            Intent in3 =new Intent("com.x.yang.thingstodo.DETAIL.UPDATE");
+                            in3.putExtra("id",id);
+                            sendBroadcast(in3);
+                        }
+
+                        Adding.this.finish();
+
                     }
                     break;
 
@@ -247,7 +302,11 @@ public class Adding extends FragmentActivity implements DataPickerFragment.DateP
     private void saveEvent(){
         Calendar c = Calendar.getInstance();
 
-        id = "2"+c.get(Calendar.YEAR)+c.get(Calendar.MONTH)+c.get(Calendar.DAY_OF_MONTH)+c.get(Calendar.HOUR)+c.get(Calendar.MINUTE)+c.get(Calendar.SECOND);
+        if(changedID != null){
+            id = changedID;
+        }else {
+            id = "2" + c.get(Calendar.YEAR) + c.get(Calendar.MONTH) + c.get(Calendar.DAY_OF_MONTH) + c.get(Calendar.HOUR) + c.get(Calendar.MINUTE) + c.get(Calendar.SECOND);
+        }
         String title = tit.getText().toString();
         String addr = add.getText().toString();
         String message = mess.getText().toString();
@@ -257,7 +316,7 @@ public class Adding extends FragmentActivity implements DataPickerFragment.DateP
         if(bitmap !=null){
         byte []data;
         String filename = id + ".png";
-
+        Log.i("adding","addphoto");
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
         data = baos.toByteArray();

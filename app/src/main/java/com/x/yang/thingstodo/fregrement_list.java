@@ -34,7 +34,9 @@ public class fregrement_list extends android.support.v4.app.Fragment {
     private ListView lv;
     SimpleAdapter sa;
     List<Map<String, Object>> listems;
+    DeleteReceiver receiver2;
     Alldata ad;
+    ArrayList<Thing_data> list;
     NewReceiver receiver;
 
     public fregrement_list() {
@@ -49,8 +51,14 @@ public class fregrement_list extends android.support.v4.app.Fragment {
         View v = inflater.inflate(R.layout.fragment_layout_list, container, false);
         listems = new ArrayList<Map<String, Object>>();
         ad =Alldata.getInstance(this.getActivity());
+        if(MainPageFragment.showlist == 1){
+            list = ad.list;
+        }else{
+            list = ad.list;
+            MainPageFragment.showlist =2;
+        }
         lv =(ListView)v.findViewById(R.id.li_list);
-        if(ad.list.isEmpty()){
+        if(list.isEmpty()){
             Map<String, Object> listem2 = new HashMap<String, Object>();
             listem2.put("head", "click to add new event");
             listem2.put("name", R.drawable.add);
@@ -68,7 +76,7 @@ public class fregrement_list extends android.support.v4.app.Fragment {
             listem.put("id","addnew");
             listem.put("date","");
             listems.add(listem);
-            Iterator<Thing_data> lt = ad.list.iterator();
+            Iterator<Thing_data> lt = list.iterator();
             while(lt.hasNext()){
                 Log.i("readlist","reading");
                 Thing_data td = lt.next();
@@ -108,6 +116,10 @@ public class fregrement_list extends android.support.v4.app.Fragment {
         IntentFilter filter=new IntentFilter();
         filter.addAction("com.x.yang.thingstodo.NEWEVENT");
         this.getActivity().registerReceiver(receiver, filter);
+        receiver2=new DeleteReceiver();
+        IntentFilter filter2=new IntentFilter();
+        filter2.addAction("com.x.yang.thingstodo.LIST.DELTED");
+        this.getActivity().registerReceiver(receiver2, filter2);
 
 
         // Inflate the layout for this fragment
@@ -155,7 +167,14 @@ public class fregrement_list extends android.support.v4.app.Fragment {
                 Intent i =new Intent(getActivity(),Adding.class);
                 startActivity(i);
             }else{
-
+                String id_d = item.get("id").toString();
+                Intent intent = new Intent("com.x.yang.DETAIL.SINGLE");
+                intent.putExtra("id",id_d);
+                fregrement_list.this.getActivity().sendBroadcast(intent);
+                Intent intet = new Intent("com.x.yang.thingstodo.DETAIL.SHOW");
+                intet.putExtra("action","normal");
+                intet.putExtra("id",id_d);
+                fregrement_list.this.getActivity().sendBroadcast(intet);
             }
 
         }
@@ -166,24 +185,102 @@ public class fregrement_list extends android.support.v4.app.Fragment {
         public void onReceive(Context context, Intent intent) {
 
             Bundle bundle=intent.getExtras();
+            Log.i("list","updatalist");
             String v;
+            list = ad.list;
 
-            Map<String, Object> listem2 = new HashMap<String, Object>();
-            listem2.put("head", bundle.getString("tit"));
-            Log.i("fre",bundle.getString("fre"));
-            if(bundle.getString("fre").equalsIgnoreCase("weekly")){
-                Log.i("fre","here");
-                listem2.put("name", R.drawable.week);
-            }else if(bundle.getString("fre").equalsIgnoreCase("daily")){
-                listem2.put("name", R.drawable.dayly);
-            }else if(bundle.getString("fre").equalsIgnoreCase("monthly")){
-                listem2.put("name", R.drawable.month);
-            }else {
-                listem2.put("name", R.drawable.once);
+            listems.clear();
+            Log.i("list","deleterequest");
+            Map<String, Object> listem = new HashMap<String, Object>();
+            listem.put("head", "click to add new event");
+            listem.put("name", R.drawable.add);
+            listem.put("id","addnew");
+            listem.put("date","");
+            listems.add(listem);
+            Iterator<Thing_data> lt = list.iterator();
+            while(lt.hasNext()){
+                Log.i("readlist","reading");
+                Thing_data td = lt.next();
+                Map<String, Object> listem2 = new HashMap<String, Object>();
+                listem2.put("head",td.getTitle());
+                if(td.getFre().equalsIgnoreCase("weekly")){
+                    Log.i("fre","here");
+                    listem2.put("name", R.drawable.week);
+                }else if(td.getFre().equalsIgnoreCase("daily")){
+                    listem2.put("name", R.drawable.dayly);
+                }else if(td.getFre().equalsIgnoreCase("monthly")){
+                    listem2.put("name", R.drawable.month);
+                }else {
+                    listem2.put("name", R.drawable.once);
+                }
+
+                listem2.put("id",td.getId());
+                if((td.getMin()) < 10 && td.getDay()<10){
+                    listem2.put("date",(td.getMonth()+1)+"-0"+td.getDay()+" "+td.getHour()+" : 0"+td.getMin());
+                }
+                else if(td.getMin() < 10){
+                    listem2.put("date",(td.getMonth()+1)+"-"+td.getDay()+" "+td.getHour()+" : 0"+td.getMin());
+                }else if(td.getDay()<10){
+                    listem2.put("date",(td.getMonth()+1)+"-0"+td.getDay()+" "+td.getHour()+" : "+td.getMin());
+                }else{
+                    listem2.put("date",(td.getMonth()+1)+"-"+td.getDay()+" "+td.getHour()+" : "+td.getMin());
+                }
+
+                listems.add(listem2);
             }
-            listem2.put("id",bundle.getString("id"));
-            listem2.put("date",bundle.getString("date"));
-            listems.add(listem2);
+
+            sa.notifyDataSetChanged();
+
+
+        }
+    }
+    public class DeleteReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Bundle bundle=intent.getExtras();
+            String v;
+            listems.clear();
+            Log.i("list","deleterequest");
+            Map<String, Object> listem = new HashMap<String, Object>();
+            listem.put("head", "click to add new event");
+            listem.put("name", R.drawable.add);
+            listem.put("id","addnew");
+            listem.put("date","");
+            listems.add(listem);
+            Iterator<Thing_data> lt = list.iterator();
+            while(lt.hasNext()){
+                Log.i("readlist","reading");
+                Thing_data td = lt.next();
+                Map<String, Object> listem2 = new HashMap<String, Object>();
+                listem2.put("head",td.getTitle());
+                if(td.getFre().equalsIgnoreCase("weekly")){
+                    Log.i("fre","here");
+                    listem2.put("name", R.drawable.week);
+                }else if(td.getFre().equalsIgnoreCase("daily")){
+                    listem2.put("name", R.drawable.dayly);
+                }else if(td.getFre().equalsIgnoreCase("monthly")){
+                    listem2.put("name", R.drawable.month);
+                }else {
+                    listem2.put("name", R.drawable.once);
+                }
+
+                listem2.put("id",td.getId());
+                if((td.getMin()) < 10 && td.getDay()<10){
+                    listem2.put("date",(td.getMonth()+1)+"-0"+td.getDay()+" "+td.getHour()+" : 0"+td.getMin());
+                }
+                else if(td.getMin() < 10){
+                    listem2.put("date",(td.getMonth()+1)+"-"+td.getDay()+" "+td.getHour()+" : 0"+td.getMin());
+                }else if(td.getDay()<10){
+                    listem2.put("date",(td.getMonth()+1)+"-0"+td.getDay()+" "+td.getHour()+" : "+td.getMin());
+                }else{
+                    listem2.put("date",(td.getMonth()+1)+"-"+td.getDay()+" "+td.getHour()+" : "+td.getMin());
+                }
+
+                listems.add(listem2);
+            }
+
             sa.notifyDataSetChanged();
 
 
@@ -193,6 +290,7 @@ public class fregrement_list extends android.support.v4.app.Fragment {
     @Override
     public void onDestroy() {
         this.getActivity().unregisterReceiver(receiver);
+        this.getActivity().unregisterReceiver(receiver2);
         super.onDestroy();
     }
 }

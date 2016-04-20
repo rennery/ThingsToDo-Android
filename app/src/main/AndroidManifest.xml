@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    android:versionCode="2"
+    android:versionName="1.0.1"
     package="com.x.yang.thingstodo">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -24,11 +26,14 @@
         </activity>
         <activity
             android:name=".MainPage"
-            android:label="@string/title_activity_main_page"></activity>
-        <activity android:name=".Adding"
-            android:windowSoftInputMode="adjustPan"></activity>
-        <service android:name=".backService" />
-    </application>
+            android:label="@string/title_activity_main_page" />
+        <activity
+            android:name=".Adding"
+            android:windowSoftInputMode="adjustPan" />
 
+        <service android:name=".backService" />
+
+        <activity android:name=".checkphoto"></activity>
+    </application>
 
 </manifest>
