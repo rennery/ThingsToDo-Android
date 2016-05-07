@@ -39,6 +39,7 @@ public class backService extends Service {
     public ArrayList<String>list_near;
     private SQLiteDatabase db;
     private FileIssue fi;
+    int has = 0;
     Timer timer;
     NewDReceiver receiver;
     String idofnearest,idofnext;
@@ -156,7 +157,7 @@ public class backService extends Service {
         @Override
         protected Object doInBackground(Object[] params) {
             Log.i("service","compareThread");
-            int has = 0;
+            int hs=0;
             AlarmManager alarmManager=(AlarmManager)backService.this.getSystemService(Context.ALARM_SERVICE);
             Iterator <Thing_data>it = list_today.iterator();
             Iterator <Thing_data>it2 = list.iterator();
@@ -169,7 +170,7 @@ public class backService extends Service {
                 min =td.getMin();
                 if((c.get(Calendar.HOUR_OF_DAY)+2>hour && (c.get(Calendar.HOUR_OF_DAY)+1)<=hour) || (c.get(Calendar.MINUTE)<min && c.get(Calendar.HOUR_OF_DAY)==hour)) {
                     id_o_n = td.getId();
-                    has++;
+                    hs++;
                 }
                 /*
                 Calendar c2=Calendar.getInstance();
@@ -196,7 +197,8 @@ public class backService extends Service {
 
                     alarmManager.set(AlarmManager.RTC_WAKEUP, c2.getTimeInMillis(), pi);*/
                     }
-            if(has != 0){
+            if(hs != 0 && hs>has){
+                has = hs;
                 NotificationManager manger = (NotificationManager) backService.this.getSystemService(Context.NOTIFICATION_SERVICE);
 
 
