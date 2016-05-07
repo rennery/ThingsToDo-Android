@@ -242,6 +242,8 @@ public class Adding extends FragmentActivity implements DataPickerFragment.DateP
                         setResult(RESULT_CANCELED);
                     }
                     Adding.this.finish();
+
+
                     break;
                 case R.id.cam:
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -269,17 +271,7 @@ public class Adding extends FragmentActivity implements DataPickerFragment.DateP
 
                         saveEvent();
                         for(int i=0;i<4000;i++);
-                        Intent in =new Intent("com.x.yang.thingstodo.NEWEVENT");
 
-                        in.putExtra("tit",tit.getText().toString());
-                        in.putExtra("fre",frequent);
-                        in.putExtra("id",id);
-                        if(min<10){
-                            in.putExtra("date",(month+1)+"-"+day+" "+hour+" : 0"+min);
-                        }else{
-                            in.putExtra("date",(month+1)+"-"+day+" "+hour+" : "+min);
-                        }
-                        sendBroadcast(in);
                         Intent in2 =new Intent("com.x.yang.thingstodo.NEWEVENT_S");
                         sendBroadcast(in2);
                         if(changedID != null){
@@ -288,6 +280,7 @@ public class Adding extends FragmentActivity implements DataPickerFragment.DateP
                             in3.putExtra("id",id);
                             sendBroadcast(in3);
                         }
+
 
                         Adding.this.finish();
 

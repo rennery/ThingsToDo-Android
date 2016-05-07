@@ -111,6 +111,45 @@ public class Alldata {
         db.endTransaction();
         return opt;
     }
+
+    public void getToday(){
+        list_today.clear();
+
+        Calendar calendar= Calendar.getInstance();
+        Cursor c = db.rawQuery("SELECT * FROM things", null);
+        while (c.moveToNext()) {
+            Thing_data thing = new Thing_data();
+            thing.setId(c.getString(c.getColumnIndex("id")));
+            thing.setLatitude(c.getDouble(c.getColumnIndex("latitude")));
+            thing.setLoc(c.getString(c.getColumnIndex("location")));
+            thing.setLongtitude(c.getDouble(c.getColumnIndex("longtitude")));
+            thing.setMess(c.getString(c.getColumnIndex("messageadte")));
+            thing.setDay(c.getInt(c.getColumnIndex("day")));
+            thing.setHour(c.getInt(c.getColumnIndex("hour")));
+            thing.setYear(c.getInt(c.getColumnIndex("year")));
+            thing.setMonth(c.getInt(c.getColumnIndex("month")));
+            thing.setMin(c.getInt(c.getColumnIndex("min")));
+            thing.setFre(c.getString(c.getColumnIndex("repeat")));
+            thing.setTitle(c.getString(c.getColumnIndex("title")));
+            // format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//                sdf.setTimeZone(TimeZone.getTimeZone("GMT+0"));
+            // Date dated = new Date(timestamp * 1000);
+            //thing.setThingdate(sdf.format(dated));
+
+            //thing.setThingdate((Date) format.parse(str));
+
+            if(thing.getFre().contains("daily")||thing.getFre().contains("dayly")){
+                list_today.add(thing);
+            }else if(thing.getFre().contains("monthly") &&(thing.getDay() == calendar.get(Calendar.DAY_OF_MONTH))){
+                list_today.add(thing);
+            }else if((thing.getDay() == calendar.get(Calendar.DAY_OF_MONTH))&&(thing.getDay() == calendar.get(Calendar.DAY_OF_MONTH))&&(thing.getDay() == calendar.get(Calendar.DAY_OF_MONTH))){
+                list_today.add(thing);
+            }
+        }
+        c.close();
+        Log.i("mess","i am here2");
+
+    }
     public Thing_data getDatafromDB(String id){
         ArrayList<Thing_data> ss = new ArrayList<Thing_data>();
         try {
@@ -167,6 +206,15 @@ public class Alldata {
     private class readingData extends AsyncTask {
 
         @Override
+        protected void onPostExecute(Object o) {
+            super.onPostExecute(o);
+            Intent in =new Intent("com.x.yang.thingstodo.NEWEVENT");
+
+
+            cx.sendBroadcast(in);
+        }
+
+        @Override
         protected Object doInBackground(Object[] params) {
             list.clear();
             Log.i("mess","i am here");
@@ -197,7 +245,7 @@ public class Alldata {
             Intent in = new Intent("com.x.yang.thingstodo.NEWEVENT");
             cx.sendBroadcast(in);
             Calendar calendar= Calendar.getInstance();
-            Cursor c2 = db.rawQuery("SELECT * FROM things where year ="+calendar.get(Calendar.YEAR)+" and month ="+calendar.get(Calendar.MONTH)+" and day ="+calendar.get(Calendar.DAY_OF_MONTH), null);
+            Cursor c2 = db.rawQuery("SELECT * FROM things", null);
             while (c.moveToNext()) {
                 Thing_data thing = new Thing_data();
                 thing.setId(c.getString(c.getColumnIndex("id")));
@@ -219,7 +267,13 @@ public class Alldata {
 
                 //thing.setThingdate((Date) format.parse(str));
 
-                list_today.add(thing);
+                if(thing.getFre().contains("daily")||thing.getFre().contains("dayly")){
+                    list_today.add(thing);
+                }else if(thing.getFre().contains("monthly") &&(thing.getDay() == calendar.get(Calendar.DAY_OF_MONTH))){
+                    list_today.add(thing);
+                }else if((thing.getDay() == calendar.get(Calendar.DAY_OF_MONTH))&&(thing.getDay() == calendar.get(Calendar.DAY_OF_MONTH))&&(thing.getDay() == calendar.get(Calendar.DAY_OF_MONTH))){
+                    list_today.add(thing);
+                }
             }
             c.close();
             c2.close();

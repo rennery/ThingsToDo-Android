@@ -42,9 +42,12 @@ public class MainPageFragment extends Fragment {
     private TextView city1,state1,day;
     Thread mThread;
     Alldata ad;
+    SimpleAdapter sa;
+    int i = 0;
     BReceiver receiver;
     public static int showlist = 1;
     next_nearReceiver receiver2;
+    todayupdataReceiver receiver3;
     private String id_near="nu",id_next="nu";
     SimpleDateFormat formatter;
     Date curDate;
@@ -72,7 +75,7 @@ public class MainPageFragment extends Fragment {
         state1 = (TextView)v.findViewById(R.id.state);
         city1.setText(MainPage.city);
         state1.setText(MainPage.state);
-        day = (TextView)v.findViewById(R.id.day);
+        day = (TextView)v.findViewById(R.id.day);//
         receiver=new BReceiver();
         IntentFilter filter=new IntentFilter();
         filter.addAction("com.x.yang.thingstodo.GPSREADY");
@@ -81,6 +84,10 @@ public class MainPageFragment extends Fragment {
         IntentFilter filter2=new IntentFilter();
         filter2.addAction("com.x.yang.thingstodo.NEXTNEARCHANGE");
         this.getActivity().registerReceiver(receiver2, filter2);
+        receiver3=new todayupdataReceiver();
+        IntentFilter filter3=new IntentFilter();
+        filter3.addAction("com.x.yang.thingstodo.TODAYNUMBER");
+        this.getActivity().registerReceiver(receiver3, filter3);
 
 
 
@@ -113,7 +120,7 @@ public class MainPageFragment extends Fragment {
 
 
 
-        SimpleAdapter sa = new SimpleAdapter(this.getActivity(),listems,R.layout.main_page_list_layout,new String[] { "head", "name"},
+        sa = new SimpleAdapter(this.getActivity(),listems,R.layout.main_page_list_layout,new String[] { "head", "name"},
                 new int[] {R.id.allthings,R.id.thingimage});
         lv =(ListView)v.findViewById(R.id.li_main);
         lv.setAdapter(sa);
@@ -143,6 +150,20 @@ public class MainPageFragment extends Fragment {
 
         }
     }
+    public class todayupdataReceiver extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Bundle bundle=intent.getExtras();
+            HashMap<String,Object> item = (HashMap<String,Object>)lv.getItemAtPosition(0);
+            String tv = item.get("head").toString();
+            i++;
+            item.remove("head");
+            item.put("head", "You've "+(ad.num_today+i)+" need to do today");
+            sa.notifyDataSetChanged();
+        }
+    }
 
 
     @Override
@@ -150,6 +171,7 @@ public class MainPageFragment extends Fragment {
         Log.i("kill","killed");
         this.getActivity().unregisterReceiver(receiver);
         this.getActivity().unregisterReceiver(receiver2);
+        this.getActivity().unregisterReceiver(receiver3);
         super.onDestroy();
     }
     private class listclick_main implements AdapterView.OnItemClickListener {

@@ -167,7 +167,7 @@ public class backService extends Service {
                 int hour,min,i;
                 hour = td.getHour();
                 min =td.getMin();
-                if((c.get(Calendar.HOUR_OF_DAY)<hour && (c.get(Calendar.HOUR_OF_DAY)+1)<hour) || (c.get(Calendar.MINUTE)<min && c.get(Calendar.HOUR_OF_DAY)==hour)) {
+                if((c.get(Calendar.HOUR_OF_DAY)+2>hour && (c.get(Calendar.HOUR_OF_DAY)+1)<=hour) || (c.get(Calendar.MINUTE)<min && c.get(Calendar.HOUR_OF_DAY)==hour)) {
                     id_o_n = td.getId();
                     has++;
                 }
@@ -203,7 +203,7 @@ public class backService extends Service {
                 Notification notification = new Notification();
                 //notification.icon = R.drawable.notice;
                 Intent intent = new Intent(backService.this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 intent.putExtra("action","nearevent");
                 intent.putStringArrayListExtra("list_near",list_near);
                 PendingIntent pi = PendingIntent.getActivity(backService.this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
@@ -252,7 +252,7 @@ public class backService extends Service {
 
                 intent.putExtra("action","nearevent");
                 intent.putStringArrayListExtra("list_near",list_near);
-                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 PendingIntent pi = PendingIntent.getActivity(backService.this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 
                 Notification notify2 = new Notification.Builder(backService.this)

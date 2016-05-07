@@ -79,6 +79,13 @@ public class MainPage extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_page);
         created = true;
+       /* if(getIntent().getExtras()!=null){
+            if(getIntent().getExtras().getString("action")!=null){
+            Intent i =new Intent(this,MainActivity.class);
+            startActivity(i);
+            this.finish();
+            }
+        }*/
         ir =new InnerReceiver();
         IntentFilter filter2=new IntentFilter();
         filter2.addAction("com.x.yang.DETAIL.SINGLE");
@@ -220,6 +227,7 @@ public class MainPage extends FragmentActivity {
 
     @Override
     protected void onDestroy() {
+        if(ls != null)
         ls.quit();
         this.unregisterReceiver(receiver);
         this.unregisterReceiver(ir);
@@ -229,7 +237,9 @@ public class MainPage extends FragmentActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+
             TabHost.setCurrentTab(2);
+
 
         }
     }
@@ -279,7 +289,7 @@ public class MainPage extends FragmentActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        this.finish();
+
         super.onSaveInstanceState(outState);
     }
 }
